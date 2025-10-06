@@ -5,7 +5,8 @@
 #include <algorithm>
 
 // Структура для хранения информации о правонарушении
-struct Violation {
+struct Violation
+{
     std::string date;
     std::string description;
     double fine_amount;
@@ -16,7 +17,8 @@ struct Violation {
 };
 
 // Узел бинарного дерева
-struct TreeNode {
+struct TreeNode 
+{
     std::string car_number;
     std::vector<Violation> violations;
     TreeNode* left;
@@ -28,74 +30,94 @@ struct TreeNode {
 };
 
 // Класс для базы данных ГАИ
-class PoliceDatabase {
+class PoliceDatabase
+{
 private:
     TreeNode* root;
 
     // Рекурсивные вспомогательные методы
-    TreeNode* insert(TreeNode* node, const std::string& car_number, const Violation& violation) {
-        if (node == nullptr) {
+    TreeNode* insert(TreeNode* node, const std::string& car_number, const Violation& violation) 
+    {
+        if (node == nullptr)
+        {
             TreeNode* newNode = new TreeNode(car_number);
             newNode->violations.push_back(violation);
             return newNode;
         }
 
-        if (car_number < node->car_number) {
+        if (car_number < node->car_number)
+        {
             node->left = insert(node->left, car_number, violation);
         }
-        else if (car_number > node->car_number) {
+        else if (car_number > node->car_number) 
+        {
             node->right = insert(node->right, car_number, violation);
         }
-        else {
+        else 
+        {
             // Номер уже существует, добавляем нарушение в список
             node->violations.push_back(violation);
         }
         return node;
     }
 
-    TreeNode* find(TreeNode* node, const std::string& car_number) const {
-        if (node == nullptr || node->car_number == car_number) {
+    TreeNode* find(TreeNode* node, const std::string& car_number) const 
+    {
+        if (node == nullptr || node->car_number == car_number)
+        {
             return node;
         }
 
-        if (car_number < node->car_number) {
+        if (car_number < node->car_number) 
+        {
             return find(node->left, car_number);
         }
-        else {
+        else 
+        {
             return find(node->right, car_number);
         }
     }
 
-    void printInOrder(TreeNode* node) const {
-        if (node != nullptr) {
+    void printInOrder(TreeNode* node) const 
+    {
+        if (node != nullptr) 
+        {
             printInOrder(node->left);
             printCarData(node);
             printInOrder(node->right);
         }
     }
 
-    void printInRange(TreeNode* node, const std::string& start, const std::string& end) const {
-        if (node != nullptr) {
-            if (node->car_number >= start) {
+    void printInRange(TreeNode* node, const std::string& start, const std::string& end) const 
+    {
+        if (node != nullptr)
+        {
+            if (node->car_number >= start)
+            {
                 printInRange(node->left, start, end);
             }
 
-            if (node->car_number >= start && node->car_number <= end) {
+            if (node->car_number >= start && node->car_number <= end)
+            {
                 printCarData(node);
             }
 
-            if (node->car_number <= end) {
+            if (node->car_number <= end) 
+            {
                 printInRange(node->right, start, end);
             }
         }
     }
 
-    void saveToFile(TreeNode* node, std::ofstream& file) const {
-        if (node != nullptr) {
+    void saveToFile(TreeNode* node, std::ofstream& file) const 
+    {
+        if (node != nullptr) 
+        {
             saveToFile(node->left, file);
 
             // Сохраняем данные об автомобиле и его нарушениях
-            for (const auto& violation : node->violations) {
+            for (const auto& violation : node->violations) 
+            {
                 file << node->car_number << "|"
                     << violation.date << "|"
                     << violation.description << "|"
@@ -106,20 +128,24 @@ private:
         }
     }
 
-    void clearTree(TreeNode* node) {
-        if (node != nullptr) {
+    void clearTree(TreeNode* node) 
+    {
+        if (node != nullptr) 
+        {
             clearTree(node->left);
             clearTree(node->right);
             delete node;
         }
     }
 
-    void printCarData(TreeNode* node) const {
+    void printCarData(TreeNode* node) const 
+    {
         std::cout << "Автомобиль: " << node->car_number << "\n";
         std::cout << "Количество нарушений: " << node->violations.size() << "\n";
 
         double total_fine = 0;
-        for (size_t i = 0; i < node->violations.size(); ++i) {
+        for (size_t i = 0; i < node->violations.size(); ++i) 
+        {
             std::cout << "  " << i + 1 << ". Дата: " << node->violations[i].date
                 << ", Описание: " << node->violations[i].description
                 << ", Штраф: " << node->violations[i].fine_amount << " руб.\n";
@@ -132,13 +158,15 @@ private:
 public:
     PoliceDatabase() : root(nullptr) {}
 
-    ~PoliceDatabase() {
+    ~PoliceDatabase() 
+    {
         clearTree(root);
     }
 
     // Добавление квитанции
     void addTicket(const std::string& car_number, const std::string& date,
-        const std::string& description, double fine_amount) {
+        const std::string& description, double fine_amount) 
+    {
         Violation violation(date, description, fine_amount);
         root = insert(root, car_number, violation);
         std::cout << "Квитанция добавлена для автомобиля " << car_number << "\n";
@@ -157,7 +185,8 @@ public:
     }
 
     // Распечатка данных по заданному номеру
-    void printByNumber(const std::string& car_number) const {
+    void printByNumber(const std::string& car_number) const 
+    {
         TreeNode* node = find(root, car_number);
         if (node != nullptr) {
             std::cout << "=== ДАННЫЕ ПО АВТОМОБИЛЮ " << car_number << " ===\n";
@@ -169,7 +198,8 @@ public:
     }
 
     // Распечатка данных по диапазону номеров
-    void printByRange(const std::string& start_number, const std::string& end_number) const {
+    void printByRange(const std::string& start_number, const std::string& end_number) const 
+    {
         std::cout << "=== ДАННЫЕ ПО ДИАПАЗОНУ НОМЕРОВ " << start_number
             << " - " << end_number << " ===\n";
         printInRange(root, start_number, end_number);
@@ -177,9 +207,11 @@ public:
     }
 
     // Сохранение в файл
-    void saveToFile(const std::string& filename) const {
+    void saveToFile(const std::string& filename) const 
+    {
         std::ofstream file(filename);
-        if (!file.is_open()) {
+        if (!file.is_open()) 
+        {
             std::cout << "Ошибка открытия файла для записи: " << filename << "\n";
             return;
         }
@@ -190,9 +222,11 @@ public:
     }
 
     // Загрузка из файла
-    void loadFromFile(const std::string& filename) {
+    void loadFromFile(const std::string& filename)
+    {
         std::ifstream file(filename);
-        if (!file.is_open()) {
+        if (!file.is_open()) 
+        {
             std::cout << "Ошибка открытия файла для чтения: " << filename << "\n";
             return;
         }
@@ -202,14 +236,16 @@ public:
         root = nullptr;
 
         std::string line;
-        while (std::getline(file, line)) {
+        while (std::getline(file, line))
+        {
             if (line.empty()) continue;
 
             size_t pos1 = line.find('|');
             size_t pos2 = line.find('|', pos1 + 1);
             size_t pos3 = line.find('|', pos2 + 1);
 
-            if (pos1 != std::string::npos && pos2 != std::string::npos && pos3 != std::string::npos) {
+            if (pos1 != std::string::npos && pos2 != std::string::npos && pos3 != std::string::npos)
+            {
                 std::string car_number = line.substr(0, pos1);
                 std::string date = line.substr(pos1 + 1, pos2 - pos1 - 1);
                 std::string description = line.substr(pos2 + 1, pos3 - pos2 - 1);
@@ -224,13 +260,15 @@ public:
     }
 
     // Проверка пустоты базы данных
-    bool isEmpty() const {
+    bool isEmpty() const 
+    {
         return root == nullptr;
     }
 };
 
 // Функция для отображения меню
-void displayMenu() {
+void displayMenu() 
+{
     std::cout << "\n=== СИСТЕМА БАЗЫ ДАННЫХ ГАИ ===\n";
     std::cout << "1. Добавить квитанцию\n";
     std::cout << "2. Полная распечатка базы данных\n";
@@ -242,19 +280,19 @@ void displayMenu() {
     std::cout << "Выберите действие: ";
 }
 
-int main() {
+void main() 
+{
     PoliceDatabase database;
     int choice;
-
-    // Установка локализации для русского языка
-    setlocale(LC_ALL, "Russian");
+    setlocale(LC_ALL, "");
 
     do {
         displayMenu();
         std::cin >> choice;
         std::cin.ignore(); // Очистка буфера
 
-        switch (choice) {
+        switch (choice)
+        {
         case 1: {
             std::string car_number, date, description;
             double fine;
@@ -277,7 +315,8 @@ int main() {
             database.printAll();
             break;
 
-        case 3: {
+        case 3: 
+            {
             std::string car_number;
             std::cout << "Введите номер автомобиля для поиска: ";
             std::getline(std::cin, car_number);
@@ -285,7 +324,8 @@ int main() {
             break;
         }
 
-        case 4: {
+        case 4:
+        {
             std::string start, end;
             std::cout << "Введите начальный номер диапазона: ";
             std::getline(std::cin, start);
@@ -295,7 +335,8 @@ int main() {
             break;
         }
 
-        case 5: {
+        case 5: 
+        {
             std::string filename;
             std::cout << "Введите имя файла для сохранения: ";
             std::getline(std::cin, filename);
@@ -303,7 +344,8 @@ int main() {
             break;
         }
 
-        case 6: {
+        case 6: 
+        {
             std::string filename;
             std::cout << "Введите имя файла для загрузки: ";
             std::getline(std::cin, filename);
@@ -321,5 +363,5 @@ int main() {
         }
     } while (choice != 7);
 
-    return 0;
+    return;
 }
